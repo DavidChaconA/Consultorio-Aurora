@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consultorio Médico Distribuido</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Consultorio Aurora</h1>
+    <p>Sistema distribuido para gestión de pacientes, citas e historial clínico</p>
+  </header>
+
+  <main>
+    <section id="auth" class="card">
+      <h2>Acceso al sistema</h2>
+      <div class="grid two">
+        <form id="loginForm">
+          <h3>Iniciar sesión</h3>
+          <input name="username" placeholder="Usuario" required>
+          <input name="password" type="password" placeholder="Contraseña" required>
+          <button>Entrar</button>
+        </form>
+
+        <form id="registerForm">
+          <h3>Registro de paciente</h3>
+          <input name="username" placeholder="Usuario" required>
+          <input name="password" type="password" placeholder="Contraseña" required>
+          <input name="nombre" placeholder="Nombre" required>
+          <input name="direccion" placeholder="Dirección" required>
+          <input name="correo" type="email" placeholder="Correo" required>
+          <input name="telefono" placeholder="Teléfono" required>
+          <input name="edad" type="number" placeholder="Edad" required>
+          <select name="sexo" required>
+            <option value="">Sexo</option>
+            <option>Femenino</option>
+            <option>Masculino</option>
+            <option>No especificado</option>
+          </select>
+          <button>Registrar</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="app" class="hidden">
+      <div class="card row between">
+        <div>
+          <h2 id="welcome">Sesión iniciada</h2>
+          <p id="role"></p>
+        </div>
+        <button id="logoutBtn" class="secondary">Cerrar sesión</button>
+      </div>
+
+      <section class="card">
+        <h2>Notificaciones</h2>
+        <button id="loadNotifications">Actualizar notificaciones</button>
+        <div id="notifications"></div>
+      </section>
+
+      <section id="doctorPanel" class="hidden">
+        <section class="card">
+          <h2>Pacientes</h2>
+          <button id="loadPatients">Cargar pacientes</button>
+          <div id="patientsTable"></div>
+        </section>
+
+        <section class="card">
+          <h2>Registrar cita para un paciente</h2>
+          <form id="doctorAppointmentForm" class="grid four">
+            <select name="paciente_id" id="doctorPatientSelect" required></select>
+            <input name="fecha" type="date" required>
+            <input name="hora" type="time" required>
+            <button>Registrar cita</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Registrar historial clínico</h2>
+          <form id="clinicalForm" class="grid two">
+            <select name="paciente_id" id="clinicalPatientSelect" required></select>
+            <input name="temperatura" placeholder="Temperatura corporal" required>
+            <input name="peso" placeholder="Peso" required>
+            <input name="altura" placeholder="Altura" required>
+            <input name="presion_arterial" placeholder="Presión arterial" required>
+            <textarea name="diagnostico" placeholder="Diagnóstico" required></textarea>
+            <textarea name="resultados" placeholder="Resultados de análisis clínicos"></textarea>
+            <textarea name="prescripciones" placeholder="Prescripciones"></textarea>
+            <button>Guardar historial</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Reportes del médico</h2>
+          <button id="reportPatients">Lista de pacientes</button>
+          <button id="reportCalendar">Calendario de citas</button>
+          <button id="reportHistory">Historial clÃ­nico</button>
+          <pre id="reports"></pre>
+        </section>
+      </section>
+
+      <section id="patientPanel" class="hidden">
+        <section class="card">
+          <h2>Mis datos</h2>
+          <form id="myPatientForm" class="grid two">
+            <input name="nombre" placeholder="Nombre">
+            <input name="direccion" placeholder="Dirección">
+            <input name="correo" placeholder="Correo">
+            <input name="telefono" placeholder="Teléfono">
+            <input name="edad" type="number" placeholder="Edad">
+            <select name="sexo">
+              <option value="">Sin cambio</option>
+              <option>Femenino</option>
+              <option>Masculino</option>
+              <option>No especificado</option>
+            </select>
+            <button>Actualizar datos</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Reservar cita</h2>
+          <form id="patientAppointmentForm" class="grid three">
+            <input name="fecha" type="date" required>
+            <input name="hora" type="time" required>
+            <button>Reservar</button>
+          </form>
+        </section>
+      </section>
+
+      <section class="card">
+        <h2>Citas</h2>
+        <button id="loadAppointments">Cargar citas</button>
+        <div id="appointmentsTable"></div>
+      </section>
+
+      <section class="card">
+        <h2>Historial clínico</h2>
+        <div id="historyControls"></div>
+        <div class="history-actions">
+          <button id="loadHistory">Cargar historial</button>
+          <button id="loadHistoryReport" class="secondary">Cargar reporte oficial</button>
+        </div>
+        <div id="history" class="history-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

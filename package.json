@@ -1,0 +1,18 @@
+{
+  "name": "consultorio-distribuido-simple",
+  "version": "1.0.0",
+  "description": "Sistema distribuido simple para gestión de citas de un consultorio médico.",
+  "main": "src/server.js",
+  "scripts": {
+    "init-db": "node scripts/init-db.js",
+    "seed": "node scripts/seed.js",
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test:concurrency": "node scripts/test-concurrency.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.9.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

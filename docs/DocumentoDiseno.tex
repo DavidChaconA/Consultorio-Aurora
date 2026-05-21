@@ -1,0 +1,119 @@
+\documentclass[12pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{hyperref}
+
+\geometry{margin=2.5cm}
+\singlespacing
+
+\titleformat{\section}
+  {\centering\bfseries\large}
+  {}
+  {0pt}
+  {}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+
+    {\Large \textbf{Universidad Autónoma de Yucatán}}\par
+    \vspace{0.25cm}
+    {\large Facultad de Matemáticas}\par
+    \vspace{0.25cm}
+    {\large Licenciatura en Ciencias de la Computación}\par
+
+    \vspace{0.8cm}
+
+    {\large \textbf{Sistemas Distribuidos}}\par
+    \vspace{0.25cm}
+    {\large \textbf{Octavo semestre}}\par
+
+    \vspace{0.9cm}
+
+    {\Large \textbf{Documento de diseño}}\par
+    \vspace{0.25cm}
+    {\large Sistema Distribuido para la Gestión de Citas de un Consultorio Médico}\par
+
+    \vspace{0.9cm}
+
+    \begin{minipage}{0.92\textwidth}
+        \setlength{\parindent}{0pt}
+        \textbf{Contenido:} Descripción de la arquitectura, base de datos, servicios web, interfaz de usuario, control de concurrencia y mecanismos de seguridad.\\
+        \textbf{Instrucciones:} Diseñar e implementar una aplicación distribuida de tres capas para la gestión de pacientes, citas médicas, historial clínico y reportes.
+    \end{minipage}
+
+    \vspace{0.9cm}
+
+    {\normalsize \textbf{Profesor}}\par
+    \vspace{0.1cm}
+    {\normalsize Nombre del profesor}\par
+    \vspace{0.35cm}
+
+    {\normalsize \textbf{Alumno}}\par
+    \vspace{0.1cm}
+    {\normalsize Chacón Ambrosio, David Efraín}\par
+    \vspace{0.35cm}
+
+    {\normalsize \textbf{Ciclo escolar Enero -- Mayo 2026}}\par
+
+    \vfill
+\end{titlepage}
+
+\section{Descripción general}
+
+El sistema implementado permite gestionar pacientes, citas médicas, historial clínico y reportes dentro de un consultorio médico. La solución se diseñó como una aplicación distribuida basada en tres capas: presentación, lógica de negocio y datos. La comunicación entre la interfaz y la lógica de negocio se realiza mediante servicios web REST.
+
+El sistema considera dos tipos de usuarios: pacientes y médico. Los pacientes pueden registrarse, modificar sus datos, reservar citas, consultar sus notificaciones y revisar su historial clínico. El médico puede administrar pacientes, registrar o cancelar citas, agregar registros clínicos y generar reportes.
+
+\section{Arquitectura del sistema}
+
+La capa de presentación está formada por una interfaz web desarrollada con HTML, CSS y JavaScript. Esta capa permite a los usuarios interactuar con el sistema desde un navegador.
+
+La capa de lógica de negocio está implementada con Node.js y Express. En esta capa se validan las reglas del sistema, se procesan las operaciones de pacientes, citas e historial clínico, se aplica el control de concurrencia y se verifican los permisos de acceso.
+
+La capa de datos utiliza SQLite para almacenar usuarios, pacientes, citas, notificaciones e historial clínico. La base de datos también contiene una restricción única que evita registrar dos citas activas en el mismo horario.
+
+\section{Diseño de la base de datos}
+
+La tabla \texttt{users} almacena las cuentas de acceso, el nombre de usuario, la contraseña protegida mediante hash y el rol del usuario. La tabla \texttt{patients} almacena los datos generales de cada paciente: nombre, dirección, correo electrónico, teléfono, edad y sexo.
+
+La tabla \texttt{appointments} almacena las citas médicas. Cada cita incluye paciente, fecha, hora, estado y usuario que la creó. Para evitar duplicidad de horarios, se definió una restricción única sobre fecha y hora para citas activas.
+
+La tabla \texttt{clinical\_records} almacena el historial clínico. Los campos sensibles, como temperatura, peso, altura, presión arterial, diagnóstico, resultados y prescripciones, se guardan cifrados. Finalmente, la tabla \texttt{notifications} almacena avisos para los usuarios.
+
+\section{Servicios web}
+
+El sistema expone sus funcionalidades mediante una API REST. Entre los servicios principales se encuentran el registro e inicio de sesión, gestión de pacientes, gestión de citas, registro de historial clínico, consulta de reportes y consulta de notificaciones.
+
+Las rutas protegidas requieren autenticación mediante un token firmado. Además, algunas rutas solo pueden ser utilizadas por el médico, como la lista general de pacientes, el calendario de citas y el registro de historial clínico.
+
+\section{Control de concurrencia}
+
+El principal problema de concurrencia se presenta cuando dos usuarios intentan reservar el mismo horario al mismo tiempo. Para resolverlo se implemento un mecanismo de exclusion mutua distribuida en la capa de logica de negocio.
+
+Cada horario tiene una llave de bloqueo formada por la fecha y la hora de la cita y se persiste en una tabla compartida llamada \texttt{distributed\_locks}. Cuando una solicitud intenta registrar una cita, primero debe obtener el bloqueo correspondiente. Despues verifica la disponibilidad del horario, registra la cita si esta libre y finalmente libera el bloqueo.
+
+Además del bloqueo en la lógica de negocio, la base de datos tiene una restricción única sobre las citas activas. De esta forma, el sistema cuenta con una doble protección contra condiciones de carrera.
+
+\section{Seguridad}
+
+Las contraseñas de los usuarios no se almacenan en texto plano. Se guardan mediante un hash con sal generado con \texttt{crypto.scrypt}. Para el acceso al sistema se utilizan tokens firmados, los cuales se envían en las solicitudes protegidas.
+
+El sistema también aplica control de acceso por rol. El médico puede consultar la información administrativa, mientras que cada paciente solo puede consultar o modificar su propia información. Los datos clínicos se almacenan cifrados mediante AES-256-GCM para proteger la confidencialidad de la historia clínica.
+
+\section{Reportes}
+
+El sistema genera tres reportes principales. El primero es la lista de pacientes, disponible para el médico. El segundo es el calendario de citas, también disponible para el médico. El tercero es el historial clínico de un paciente, que puede ser consultado por el médico o por el propio paciente.
+
+\section{Conclusión}
+
+La solución desarrollada cumple con los requisitos del proyecto, manteniendo una implementación sencilla y adecuada para un entorno académico. El sistema utiliza una arquitectura de tres capas, servicios web REST, autenticación de usuarios, cifrado de datos clínicos y exclusión mutua para evitar conflictos en la reserva de citas.
+
+\end{document}
