@@ -1,6 +1,6 @@
 # Consultorio Aurora - Sistema distribuido simple
 
-Sistema distribuido para la gestión de citas de un consultorio médico. La implementación se mantiene sencilla para un proyecto universitario, pero cubre los requisitos principales: tres capas, servicios web, autenticación, gestión de pacientes, gestión de citas, historial clínico cifrado, reportes y prueba de concurrencia.
+Sistema distribuido para la gestión de citas de un consultorio médico. Caracteristicas principales: tres capas, servicios web, autenticación, gestión de pacientes, gestión de citas, historial clínico cifrado, reportes y prueba de concurrencia.
 
 ## Tecnologías
 
@@ -43,7 +43,7 @@ http://localhost:3000
 
 ## Usuarios de prueba
 
-La pantalla de inicio de sesión no muestra estos datos, para que el sistema se vea más limpio. Los usuarios cargados por `npm run seed` son:
+Los usuarios cargados por `npm run seed` son:
 
 ```text
 Médico:
