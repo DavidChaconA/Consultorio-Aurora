@@ -2,6 +2,8 @@ let token = localStorage.getItem('token');
 let currentUser = null;
 let currentPatient = null;
 let cachedPatients = [];
+const APPOINTMENT_TIME_MINUTES_MIN = 9 * 60;
+const APPOINTMENT_TIME_MINUTES_MAX = 19 * 60;
 
 const $ = selector => document.querySelector(selector);
 
@@ -47,10 +49,19 @@ function formatDate(dateText) {
   return `${day}/${month}/${year}`;
 }
 
-function formatParagraph(value, emptyLabel = 'Sin registro') {
+function formatParagraph(value, emptyLabel = '') {
   const text = String(value ?? '').trim();
-  if (!text) return `<span class="hint">${emptyLabel}</span>`;
+  if (!text) return emptyLabel ? `<span class="hint">${emptyLabel}</span>` : '';
   return escapeHtml(text).replace(/\n/g, '<br>');
+}
+
+function isValidAppointmentTimeSlot(value) {
+  if (!/^\d{2}:\d{2}$/.test(value)) return false;
+  const [hours, minutes] = value.split(':').map(Number);
+  const totalMinutes = (hours * 60) + minutes;
+  return totalMinutes >= APPOINTMENT_TIME_MINUTES_MIN
+    && totalMinutes <= APPOINTMENT_TIME_MINUTES_MAX
+    && minutes % 30 === 0;
 }
 
 function getHistoryTargetPatientId() {
@@ -65,17 +76,16 @@ function renderHistoryControls() {
     const options = cachedPatients.map(p => `<option value="${p.id}">${escapeHtml(p.nombre)}</option>`).join('');
     $('#historyControls').innerHTML = options
       ? `<label class="history-filter">Paciente <select id="historyPatientSelect">${options}</select></label>`
-      : '<p class="hint">No hay pacientes disponibles.</p>';
+      : '';
     return;
   }
 
-  const patientName = currentPatient?.nombre || currentUser.username || 'Paciente';
-  $('#historyControls').innerHTML = `<p class="hint">Mostrando historial de ${escapeHtml(patientName)}.</p>`;
+  $('#historyControls').innerHTML = '';
 }
 
 function renderHistory(rows) {
   if (!Array.isArray(rows) || rows.length === 0) {
-    $('#history').innerHTML = '<p class="hint">No hay registros clínicos para mostrar.</p>';
+    $('#history').innerHTML = '';
     return;
   }
 
@@ -121,7 +131,7 @@ function buildHistoryReportHtml(report) {
   const header = report?.encabezado;
   const body = Array.isArray(report?.cuerpo) ? report.cuerpo : [];
 
-  if (!header) return '<p class="hint">No se pudo generar el reporte.</p>';
+  if (!header) return '';
 
   const headerHtml = `
     <section class="history-report">
@@ -137,9 +147,7 @@ function buildHistoryReportHtml(report) {
     </section>
   `;
 
-  if (body.length === 0) {
-    return `${headerHtml}<p class="hint">No hay consultas en el cuerpo del reporte.</p>`;
-  }
+  if (body.length === 0) return headerHtml;
 
   const bodyHtml = body.map((row, index) => `
     <article class="history-card">
@@ -179,7 +187,7 @@ function renderPatientsReport(report) {
   const patients = Array.isArray(report?.pacientes) ? report.pacientes : [];
 
   if (patients.length === 0) {
-    $('#reports').innerHTML = '<p class="hint">No hay pacientes activos para mostrar en el reporte.</p>';
+    $('#reports').innerHTML = '';
     return;
   }
 
@@ -188,7 +196,6 @@ function renderPatientsReport(report) {
       <div class="report-header">
         <div>
           <h3>${escapeHtml(report.titulo || 'Lista de pacientes')}</h3>
-          <p class="hint">Reporte para el médico con los pacientes activos registrados en el sistema.</p>
         </div>
         <span class="report-badge">${patients.length} paciente(s)</span>
       </div>
@@ -219,7 +226,7 @@ function renderCalendarReport(report) {
   const cancelledCount = appointments.filter(c => c.estado === 'cancelada').length;
 
   if (appointments.length === 0) {
-    $('#reports').innerHTML = '<p class="hint">No hay citas registradas para mostrar en el calendario.</p>';
+    $('#reports').innerHTML = '';
     return;
   }
 
@@ -228,7 +235,6 @@ function renderCalendarReport(report) {
       <div class="report-header">
         <div>
           <h3>${escapeHtml(report.titulo || 'Calendario de citas')}</h3>
-          <p class="hint">Reporte cronológico de las citas registradas en el consultorio.</p>
         </div>
         <div class="report-badges">
           <span class="report-badge">${appointments.length} total</span>
@@ -261,7 +267,6 @@ function renderMedicalHistoryReport(report) {
       <div class="report-header">
         <div>
           <h3>${escapeHtml(report?.titulo || 'Historial clínico')}</h3>
-          <p class="hint">Reporte con encabezado de datos generales del paciente y cuerpo con sus consultas.</p>
         </div>
         <span class="report-badge">${Array.isArray(report?.cuerpo) ? report.cuerpo.length : 0} consulta(s)</span>
       </div>
@@ -311,7 +316,7 @@ function logout() {
   $('#historyControls').innerHTML = '';
   $('#history').innerHTML = '';
   const reports = $('#reports');
-  if (reports) reports.innerHTML = '<p class="hint">Selecciona un reporte para visualizarlo aquí.</p>';
+  if (reports) reports.innerHTML = '';
 }
 
 
@@ -387,6 +392,9 @@ async function editAppointment(id, currentDate, currentHour) {
   const horaFinal = hora.trim();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaFinal)) return toast('Fecha inválida');
   if (!/^\d{2}:\d{2}$/.test(horaFinal)) return toast('Hora inválida');
+  if (!isValidAppointmentTimeSlot(horaFinal)) {
+    return toast('La hora debe ser de 09:00 a 19:00 en intervalos de 30 minutos');
+  }
 
   await api(`/api/citas/${id}`, {
     method: 'PUT',
@@ -455,7 +463,8 @@ async function loadNotifications() {
       ${n.mensaje}<br><span class="hint">${n.created_at}</span>
       ${n.leida ? '' : `<button class="small secondary" onclick="markNotification(${n.id})">Marcar leída</button>`}
     </div>
-  `).join('') : '<p class="hint">Sin notificaciones.</p>';
+  `).join('') : '';
+
 }
 
 async function markNotification(id) {
@@ -515,7 +524,11 @@ $('#loadHistoryReport').addEventListener('click', loadHistoryReport);
 $('#patientAppointmentForm').addEventListener('submit', async e => {
   e.preventDefault();
   try {
-    await api('/api/citas', { method: 'POST', body: JSON.stringify(formToJson(e.target)) });
+    const body = formToJson(e.target);
+    if (!isValidAppointmentTimeSlot(String(body.hora || '').trim())) {
+      return toast('La hora debe ser de 09:00 a 19:00 en intervalos de 30 minutos');
+    }
+    await api('/api/citas', { method: 'POST', body: JSON.stringify(body) });
     e.target.reset();
     toast('Cita reservada');
     loadAppointments();
@@ -526,6 +539,9 @@ $('#doctorAppointmentForm').addEventListener('submit', async e => {
   e.preventDefault();
   try {
     const body = formToJson(e.target);
+    if (!isValidAppointmentTimeSlot(String(body.hora || '').trim())) {
+      return toast('La hora debe ser de 09:00 a 19:00 en intervalos de 30 minutos');
+    }
     body.paciente_id = Number(body.paciente_id);
     await api('/api/citas', { method: 'POST', body: JSON.stringify(body) });
     e.target.reset();

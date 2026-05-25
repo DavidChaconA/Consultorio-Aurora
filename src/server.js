@@ -10,6 +10,9 @@ const { hashPassword, verifyPassword, signToken, requireAuth, requireRole } = re
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const TEST_DELAY_MS = Number(process.env.TEST_DELAY_MS || 0);
+const APPOINTMENT_START_MINUTES = 9 * 60;
+const APPOINTMENT_END_MINUTES = 19 * 60;
+const APPOINTMENT_INTERVAL_MINUTES = 30;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -26,6 +29,15 @@ function isValidDateValue(value) {
 
 function isValidTimeValue(value) {
   return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+}
+
+function isValidAppointmentSlot(value) {
+  if (!isValidTimeValue(value)) return false;
+  const [hours, minutes] = value.split(':').map(Number);
+  const totalMinutes = (hours * 60) + minutes;
+  const isInsideRange = totalMinutes >= APPOINTMENT_START_MINUTES && totalMinutes <= APPOINTMENT_END_MINUTES;
+  const isCorrectInterval = minutes % APPOINTMENT_INTERVAL_MINUTES === 0;
+  return isInsideRange && isCorrectInterval;
 }
 
 function getPatientByUserId(userId) {
@@ -139,6 +151,10 @@ app.post('/api/citas', requireAuth, async (req, res) => {
     return res.status(400).json({ error: 'Formato de fecha u hora inválido' });
   }
 
+  if (!isValidAppointmentSlot(hora)) {
+    return res.status(400).json({ error: 'La cita debe ser de 09:00 a 19:00 en intervalos de 30 minutos' });
+  }
+
   if (req.user.rol === 'PACIENTE') {
     const patient = getPatientByUserId(req.user.id);
     pacienteId = patient?.id;
@@ -207,6 +223,11 @@ app.put('/api/citas/:id', requireAuth, async (req, res) => {
   if (!isValidDateValue(nuevaFecha) || !isValidTimeValue(nuevaHora)) {
     return res.status(400).json({ error: 'Formato de fecha u hora inválido' });
   }
+  const changedAppointmentTime = nuevaFecha !== cita.fecha || nuevaHora !== cita.hora;
+  if (changedAppointmentTime && !isValidAppointmentSlot(nuevaHora)) {
+    return res.status(400).json({ error: 'La cita debe ser de 09:00 a 19:00 en intervalos de 30 minutos' });
+  }
+
   const lockKey = `cita:${nuevaFecha}:${nuevaHora}`;
   let release = () => {};
 

@@ -3,13 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Consultorio Médico Distribuido</title>
+  <title>Consultorio Medico Distribuido</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
     <h1>Consultorio Aurora</h1>
-    <p>Sistema distribuido para gestión de pacientes, citas e historial clínico</p>
   </header>
 
   <main>
@@ -17,20 +16,20 @@
       <h2>Acceso al sistema</h2>
       <div class="grid two">
         <form id="loginForm">
-          <h3>Iniciar sesión</h3>
+          <h3>Iniciar sesion</h3>
           <input name="username" placeholder="Usuario" required>
-          <input name="password" type="password" placeholder="Contraseña" required>
+          <input name="password" type="password" placeholder="Contrasena" required>
           <button>Entrar</button>
         </form>
 
         <form id="registerForm">
           <h3>Registro de paciente</h3>
           <input name="username" placeholder="Usuario" required>
-          <input name="password" type="password" placeholder="Contraseña" required>
+          <input name="password" type="password" placeholder="Contrasena" required>
           <input name="nombre" placeholder="Nombre" required>
-          <input name="direccion" placeholder="Dirección" required>
+          <input name="direccion" placeholder="Direccion" required>
           <input name="correo" type="email" placeholder="Correo" required>
-          <input name="telefono" placeholder="Teléfono" required>
+          <input name="telefono" placeholder="Telefono" required>
           <input name="edad" type="number" placeholder="Edad" required>
           <select name="sexo" required>
             <option value="">Sexo</option>
@@ -46,10 +45,10 @@
     <section id="app" class="hidden">
       <div class="card row between">
         <div>
-          <h2 id="welcome">Sesión iniciada</h2>
+          <h2 id="welcome">Sesion iniciada</h2>
           <p id="role"></p>
         </div>
-        <button id="logoutBtn" class="secondary">Cerrar sesión</button>
+        <button id="logoutBtn" class="secondary">Cerrar sesion</button>
       </div>
 
       <section class="card">
@@ -70,29 +69,28 @@
           <form id="doctorAppointmentForm" class="grid four">
             <select name="paciente_id" id="doctorPatientSelect" required></select>
             <input name="fecha" type="date" required>
-            <input name="hora" type="time" required>
+            <input name="hora" type="time" min="09:00" max="19:00" step="1800" required>
             <button>Registrar cita</button>
           </form>
         </section>
 
         <section class="card">
-          <h2>Registrar historial clínico</h2>
+          <h2>Registrar historial clinico</h2>
           <form id="clinicalForm" class="grid two">
             <select name="paciente_id" id="clinicalPatientSelect" required></select>
             <input name="temperatura" placeholder="Temperatura corporal" required>
             <input name="peso" placeholder="Peso" required>
             <input name="altura" placeholder="Altura" required>
-            <input name="presion_arterial" placeholder="Presión arterial" required>
-            <textarea name="diagnostico" placeholder="Diagnóstico" required></textarea>
-            <textarea name="resultados" placeholder="Resultados de análisis clínicos"></textarea>
+            <input name="presion_arterial" placeholder="Presion arterial" required>
+            <textarea name="diagnostico" placeholder="Diagnostico" required></textarea>
+            <textarea name="resultados" placeholder="Resultados de analisis clinicos"></textarea>
             <textarea name="prescripciones" placeholder="Prescripciones"></textarea>
             <button>Guardar historial</button>
           </form>
         </section>
 
         <section class="card">
-          <h2>Reportes del médico</h2>
-          <p class="hint">Estos reportes consumen los servicios web solicitados en el proyecto y muestran la información ya procesada para el médico.</p>
+          <h2>Reportes del medico</h2>
           <div class="report-toolbar">
             <button id="reportPatients">Lista de pacientes</button>
             <button id="reportCalendar">Calendario de citas</button>
@@ -100,11 +98,9 @@
               Paciente para historial
               <select id="reportHistoryPatientSelect" required></select>
             </label>
-            <button id="reportHistory">Historial clínico</button>
+            <button id="reportHistory">Historial clinico</button>
           </div>
-          <div id="reports" class="reports-output">
-            <p class="hint">Selecciona un reporte para visualizarlo aquí.</p>
-          </div>
+          <div id="reports" class="reports-output"></div>
         </section>
       </section>
 
@@ -113,9 +109,9 @@
           <h2>Mis datos</h2>
           <form id="myPatientForm" class="grid two">
             <input name="nombre" placeholder="Nombre">
-            <input name="direccion" placeholder="Dirección">
+            <input name="direccion" placeholder="Direccion">
             <input name="correo" placeholder="Correo">
-            <input name="telefono" placeholder="Teléfono">
+            <input name="telefono" placeholder="Telefono">
             <input name="edad" type="number" placeholder="Edad">
             <select name="sexo">
               <option value="">Sin cambio</option>
@@ -131,7 +127,7 @@
           <h2>Reservar cita</h2>
           <form id="patientAppointmentForm" class="grid three">
             <input name="fecha" type="date" required>
-            <input name="hora" type="time" required>
+            <input name="hora" type="time" min="09:00" max="19:00" step="1800" required>
             <button>Reservar</button>
           </form>
         </section>
@@ -144,7 +140,7 @@
       </section>
 
       <section class="card">
-        <h2>Historial clínico</h2>
+        <h2>Historial clinico</h2>
         <div id="historyControls"></div>
         <div class="history-actions">
           <button id="loadHistory">Cargar historial</button>
