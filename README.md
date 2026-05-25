@@ -1,9 +1,9 @@
 # Consultorio Aurora - Sistema distribuido simple
 
-Integrantes:
--David Efrain Chacon Ambrosio
--Cristhian Leonel Ramirez Couoh
--Guillermo Cristian Gruintal Polanco
+## Integrantes:
+- David Efrain Chacon Ambrosio
+- Cristhian Leonel Ramirez Couoh
+- Guillermo Cristian Gruintal Polanco
 
 Sistema distribuido para la gestión de citas de un consultorio médico.  Caracteristicas principales: tres capas, servicios web, autenticación, gestión de pacientes, gestión de citas, historial clínico cifrado, reportes y prueba de concurrencia.
 
