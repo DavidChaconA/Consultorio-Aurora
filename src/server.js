@@ -136,7 +136,7 @@ app.post('/api/citas', requireAuth, async (req, res) => {
 
   if (!fecha || !hora) return res.status(400).json({ error: 'Fecha y hora son obligatorias' });
   if (!isValidDateValue(fecha) || !isValidTimeValue(hora)) {
-    return res.status(400).json({ error: 'Formato de fecha u hora invÃ¡lido' });
+    return res.status(400).json({ error: 'Formato de fecha u hora inválido' });
   }
 
   if (req.user.rol === 'PACIENTE') {
@@ -205,7 +205,7 @@ app.put('/api/citas/:id', requireAuth, async (req, res) => {
   const nuevaHora = req.body.hora || cita.hora;
   const nuevoEstado = req.body.estado || cita.estado;
   if (!isValidDateValue(nuevaFecha) || !isValidTimeValue(nuevaHora)) {
-    return res.status(400).json({ error: 'Formato de fecha u hora invÃ¡lido' });
+    return res.status(400).json({ error: 'Formato de fecha u hora inválido' });
   }
   const lockKey = `cita:${nuevaFecha}:${nuevaHora}`;
   let release = () => {};
@@ -230,7 +230,7 @@ app.put('/api/citas/:id', requireAuth, async (req, res) => {
     }
     res.json({ message: 'Cita actualizada' });
   } catch (err) {
-    res.status(409).json({ error: 'No se pudo actualizar la cita. Puede que el horario ya estÃ© ocupado.' });
+    res.status(409).json({ error: 'No se pudo actualizar la cita. Puede que el horario ya esté ocupado.' });
   } finally {
     release();
   }

@@ -75,7 +75,7 @@ function renderHistoryControls() {
 
 function renderHistory(rows) {
   if (!Array.isArray(rows) || rows.length === 0) {
-    $('#history').innerHTML = '<p class="hint">No hay registros clinicos para mostrar.</p>';
+    $('#history').innerHTML = '<p class="hint">No hay registros clínicos para mostrar.</p>';
     return;
   }
 
@@ -89,23 +89,23 @@ function renderHistory(rows) {
     <article class="history-card">
       <div class="history-card-top">
         <p class="history-card-title">Consulta ${index + 1}</p>
-        <p class="history-card-meta">Paciente: ${escapeHtml(row.paciente_nombre)} | Medico: ${escapeHtml(row.medico)} | Fecha: ${formatDate(row.fecha)}</p>
+        <p class="history-card-meta">Paciente: ${escapeHtml(row.paciente_nombre)} | Médico: ${escapeHtml(row.medico)} | Fecha: ${formatDate(row.fecha)}</p>
       </div>
 
       <div class="history-metrics">
         <div><span class="history-label">Temperatura</span><strong>${escapeHtml(row.temperatura)}</strong></div>
         <div><span class="history-label">Peso</span><strong>${escapeHtml(row.peso)}</strong></div>
         <div><span class="history-label">Altura</span><strong>${escapeHtml(row.altura)}</strong></div>
-        <div><span class="history-label">Presion arterial</span><strong>${escapeHtml(row.presion_arterial)}</strong></div>
+        <div><span class="history-label">Presión arterial</span><strong>${escapeHtml(row.presion_arterial)}</strong></div>
       </div>
 
       <div class="history-block">
-        <h4>Diagnostico</h4>
+        <h4>Diagnóstico</h4>
         <p>${formatParagraph(row.diagnostico)}</p>
       </div>
 
       <div class="history-block">
-        <h4>Resultados de analisis</h4>
+        <h4>Resultados de análisis</h4>
         <p>${formatParagraph(row.resultados)}</p>
       </div>
 
@@ -117,30 +117,28 @@ function renderHistory(rows) {
   `).join('');
 }
 
-function renderHistoryReport(report) {
+function buildHistoryReportHtml(report) {
   const header = report?.encabezado;
   const body = Array.isArray(report?.cuerpo) ? report.cuerpo : [];
 
-  if (!header) {
-    $('#history').innerHTML = '<p class="hint">No se pudo generar el reporte.</p>';
-    return;
-  }
+  if (!header) return '<p class="hint">No se pudo generar el reporte.</p>';
 
   const headerHtml = `
     <section class="history-report">
       <h3>Encabezado del paciente</h3>
-      <p><strong>Nombre:</strong> ${escapeHtml(header.nombre)}</p>
-      <p><strong>Direccion:</strong> ${escapeHtml(header.direccion)}</p>
-      <p><strong>Correo:</strong> ${escapeHtml(header.correo)}</p>
-      <p><strong>Telefono:</strong> ${escapeHtml(header.telefono)}</p>
-      <p><strong>Edad:</strong> ${escapeHtml(header.edad)}</p>
-      <p><strong>Sexo:</strong> ${escapeHtml(header.sexo)}</p>
+      <div class="report-summary">
+        <span><strong>Nombre:</strong> ${escapeHtml(header.nombre)}</span>
+        <span><strong>Dirección:</strong> ${escapeHtml(header.direccion)}</span>
+        <span><strong>Correo:</strong> ${escapeHtml(header.correo)}</span>
+        <span><strong>Teléfono:</strong> ${escapeHtml(header.telefono)}</span>
+        <span><strong>Edad:</strong> ${escapeHtml(header.edad)}</span>
+        <span><strong>Sexo:</strong> ${escapeHtml(header.sexo)}</span>
+      </div>
     </section>
   `;
 
   if (body.length === 0) {
-    $('#history').innerHTML = `${headerHtml}<p class="hint">No hay consultas en el cuerpo del reporte.</p>`;
-    return;
+    return `${headerHtml}<p class="hint">No hay consultas en el cuerpo del reporte.</p>`;
   }
 
   const bodyHtml = body.map((row, index) => `
@@ -153,14 +151,14 @@ function renderHistoryReport(report) {
         <div><span class="history-label">Temperatura</span><strong>${escapeHtml(row.temperatura)}</strong></div>
         <div><span class="history-label">Peso</span><strong>${escapeHtml(row.peso)}</strong></div>
         <div><span class="history-label">Altura</span><strong>${escapeHtml(row.altura)}</strong></div>
-        <div><span class="history-label">Presion arterial</span><strong>${escapeHtml(row.presion_arterial)}</strong></div>
+        <div><span class="history-label">Presión arterial</span><strong>${escapeHtml(row.presion_arterial)}</strong></div>
       </div>
       <div class="history-block">
-        <h4>Diagnostico</h4>
+        <h4>Diagnóstico</h4>
         <p>${formatParagraph(row.diagnostico)}</p>
       </div>
       <div class="history-block">
-        <h4>Resultados de analisis</h4>
+        <h4>Resultados de análisis</h4>
         <p>${formatParagraph(row.resultados)}</p>
       </div>
       <div class="history-block">
@@ -170,7 +168,106 @@ function renderHistoryReport(report) {
     </article>
   `).join('');
 
-  $('#history').innerHTML = headerHtml + bodyHtml;
+  return headerHtml + bodyHtml;
+}
+
+function renderHistoryReport(report) {
+  $('#history').innerHTML = buildHistoryReportHtml(report);
+}
+
+function renderPatientsReport(report) {
+  const patients = Array.isArray(report?.pacientes) ? report.pacientes : [];
+
+  if (patients.length === 0) {
+    $('#reports').innerHTML = '<p class="hint">No hay pacientes activos para mostrar en el reporte.</p>';
+    return;
+  }
+
+  $('#reports').innerHTML = `
+    <section class="report-card">
+      <div class="report-header">
+        <div>
+          <h3>${escapeHtml(report.titulo || 'Lista de pacientes')}</h3>
+          <p class="hint">Reporte para el médico con los pacientes activos registrados en el sistema.</p>
+        </div>
+        <span class="report-badge">${patients.length} paciente(s)</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Edad</th><th>Sexo</th></tr>
+        </thead>
+        <tbody>
+          ${patients.map(p => `
+            <tr>
+              <td>${escapeHtml(p.id)}</td>
+              <td>${escapeHtml(p.nombre)}</td>
+              <td>${escapeHtml(p.correo)}</td>
+              <td>${escapeHtml(p.telefono)}</td>
+              <td>${escapeHtml(p.edad)}</td>
+              <td>${escapeHtml(p.sexo)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </section>
+  `;
+}
+
+function renderCalendarReport(report) {
+  const appointments = Array.isArray(report?.citas) ? report.citas : [];
+  const activeCount = appointments.filter(c => c.estado === 'activa').length;
+  const cancelledCount = appointments.filter(c => c.estado === 'cancelada').length;
+
+  if (appointments.length === 0) {
+    $('#reports').innerHTML = '<p class="hint">No hay citas registradas para mostrar en el calendario.</p>';
+    return;
+  }
+
+  $('#reports').innerHTML = `
+    <section class="report-card">
+      <div class="report-header">
+        <div>
+          <h3>${escapeHtml(report.titulo || 'Calendario de citas')}</h3>
+          <p class="hint">Reporte cronológico de las citas registradas en el consultorio.</p>
+        </div>
+        <div class="report-badges">
+          <span class="report-badge">${appointments.length} total</span>
+          <span class="report-badge ok">${activeCount} activas</span>
+          <span class="report-badge muted">${cancelledCount} canceladas</span>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Hora</th><th>Paciente</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          ${appointments.map(c => `
+            <tr>
+              <td>${formatDate(c.fecha)}</td>
+              <td>${escapeHtml(c.hora)}</td>
+              <td>${escapeHtml(c.paciente)}</td>
+              <td><span class="status-pill ${c.estado === 'activa' ? 'active' : 'cancelled'}">${escapeHtml(c.estado)}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </section>
+  `;
+}
+
+function renderMedicalHistoryReport(report) {
+  $('#reports').innerHTML = `
+    <section class="report-card">
+      <div class="report-header">
+        <div>
+          <h3>${escapeHtml(report?.titulo || 'Historial clínico')}</h3>
+          <p class="hint">Reporte con encabezado de datos generales del paciente y cuerpo con sus consultas.</p>
+        </div>
+        <span class="report-badge">${Array.isArray(report?.cuerpo) ? report.cuerpo.length : 0} consulta(s)</span>
+      </div>
+      ${buildHistoryReportHtml(report)}
+    </section>
+  `;
 }
 
 function setSession(data) {
@@ -213,7 +310,10 @@ function logout() {
   $('#app').classList.add('hidden');
   $('#historyControls').innerHTML = '';
   $('#history').innerHTML = '';
+  const reports = $('#reports');
+  if (reports) reports.innerHTML = '<p class="hint">Selecciona un reporte para visualizarlo aquí.</p>';
 }
+
 
 function fillMyPatientForm() {
   const form = $('#myPatientForm');
@@ -228,11 +328,13 @@ async function loadPatients() {
   const options = cachedPatients.map(p => `<option value="${p.id}">${escapeHtml(p.nombre)}</option>`).join('');
   $('#doctorPatientSelect').innerHTML = options;
   $('#clinicalPatientSelect').innerHTML = options;
+  const reportSelect = $('#reportHistoryPatientSelect');
+  if (reportSelect) reportSelect.innerHTML = options;
   renderHistoryControls();
 
   $('#patientsTable').innerHTML = `
     <table>
-      <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Telefono</th><th>Edad</th><th>Sexo</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Edad</th><th>Sexo</th><th>Acciones</th></tr></thead>
       <tbody>${cachedPatients.map(p => `
         <tr>
           <td>${p.id}</td>
@@ -283,8 +385,8 @@ async function editAppointment(id, currentDate, currentHour) {
   if (hora === null) return;
   const fechaFinal = fecha.trim();
   const horaFinal = hora.trim();
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaFinal)) return toast('Fecha invalida');
-  if (!/^\d{2}:\d{2}$/.test(horaFinal)) return toast('Hora invalida');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaFinal)) return toast('Fecha inválida');
+  if (!/^\d{2}:\d{2}$/.test(horaFinal)) return toast('Hora inválida');
 
   await api(`/api/citas/${id}`, {
     method: 'PUT',
@@ -296,7 +398,7 @@ async function editAppointment(id, currentDate, currentHour) {
 }
 
 async function cancelAppointment(id) {
-  if (!confirm('Cancelar cita?')) return;
+  if (!confirm('¿Cancelar cita?')) return;
   await api(`/api/citas/${id}`, { method: 'DELETE' });
   toast('Cita cancelada');
   loadAppointments();
@@ -308,18 +410,18 @@ async function editPatient(patientId) {
 
   const nombre = prompt('Nombre:', patient.nombre);
   if (nombre === null) return;
-  const direccion = prompt('Direccion:', patient.direccion);
+  const direccion = prompt('Dirección:', patient.direccion);
   if (direccion === null) return;
   const correo = prompt('Correo:', patient.correo);
   if (correo === null) return;
-  const telefono = prompt('Telefono:', patient.telefono);
+  const telefono = prompt('Teléfono:', patient.telefono);
   if (telefono === null) return;
   const edad = prompt('Edad:', String(patient.edad));
   if (edad === null) return;
   const sexo = prompt('Sexo:', patient.sexo);
   if (sexo === null) return;
   const edadValue = Number(edad);
-  if (!Number.isFinite(edadValue) || edadValue <= 0) return toast('Edad invalida');
+  if (!Number.isFinite(edadValue) || edadValue <= 0) return toast('Edad inválida');
 
   await api(`/api/pacientes/${patientId}`, {
     method: 'PUT',
@@ -339,7 +441,7 @@ async function editPatient(patientId) {
 }
 
 async function deletePatient(patientId) {
-  if (!confirm('Eliminar logicamente este paciente?')) return;
+  if (!confirm('¿Eliminar lógicamente este paciente?')) return;
   await api(`/api/pacientes/${patientId}`, { method: 'DELETE' });
   toast('Paciente eliminado');
   await loadPatients();
@@ -455,19 +557,19 @@ $('#clinicalForm').addEventListener('submit', async e => {
 
 $('#reportPatients').addEventListener('click', async () => {
   const data = await api('/api/reportes/pacientes');
-  $('#reports').textContent = JSON.stringify(data, null, 2);
+  renderPatientsReport(data);
 });
 
 $('#reportCalendar').addEventListener('click', async () => {
   const data = await api('/api/reportes/calendario');
-  $('#reports').textContent = JSON.stringify(data, null, 2);
+  renderCalendarReport(data);
 });
 
 $('#reportHistory')?.addEventListener('click', async () => {
-  const patientId = getHistoryTargetPatientId();
+  const patientId = $('#reportHistoryPatientSelect')?.value || getHistoryTargetPatientId();
   if (!patientId) return toast('Selecciona un paciente para el reporte');
   const data = await api(`/api/reportes/historial/${patientId}`);
-  $('#reports').textContent = JSON.stringify(data, null, 2);
+  renderMedicalHistoryReport(data);
   renderHistoryReport(data);
 });
 

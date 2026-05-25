@@ -1,4 +1,4 @@
 node_modules/
-data/
 .env
-*.log
+data/consultorio.db
+npm-debug.log

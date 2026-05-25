@@ -1,6 +1,6 @@
 # Consultorio Aurora - Sistema distribuido simple
 
-Sistema distribuido para la gestión de citas de un consultorio médico. Caracteristicas principales: tres capas, servicios web, autenticación, gestión de pacientes, gestión de citas, historial clínico cifrado, reportes y prueba de concurrencia.
+Sistema distribuido para la gestión de citas de un consultorio médico.  Caracteristicas principales: tres capas, servicios web, autenticación, gestión de pacientes, gestión de citas, historial clínico cifrado, reportes y prueba de concurrencia.
 
 ## Tecnologías
 

@@ -92,10 +92,19 @@
 
         <section class="card">
           <h2>Reportes del médico</h2>
-          <button id="reportPatients">Lista de pacientes</button>
-          <button id="reportCalendar">Calendario de citas</button>
-          <button id="reportHistory">Historial clÃ­nico</button>
-          <pre id="reports"></pre>
+          <p class="hint">Estos reportes consumen los servicios web solicitados en el proyecto y muestran la información ya procesada para el médico.</p>
+          <div class="report-toolbar">
+            <button id="reportPatients">Lista de pacientes</button>
+            <button id="reportCalendar">Calendario de citas</button>
+            <label class="report-filter">
+              Paciente para historial
+              <select id="reportHistoryPatientSelect" required></select>
+            </label>
+            <button id="reportHistory">Historial clínico</button>
+          </div>
+          <div id="reports" class="reports-output">
+            <p class="hint">Selecciona un reporte para visualizarlo aquí.</p>
+          </div>
         </section>
       </section>
 
